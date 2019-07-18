@@ -1,5 +1,5 @@
 import scrapy
-import time
+import re
 import datetime
 from pandas.tseries.offsets import Day
 from DNSscrapy.spiders.instanceItem import instanceItem
@@ -10,56 +10,96 @@ class dnsSpider(scrapy.Spider):
     ts = gen_timestamp()
     today = datetime.datetime.now()
     st = (today - 1 * Day()).strftime('%Y-%m-%d %H:%M:%S')  # 格式化
-    print(st+"-----")
-    #st = time.strftime('%Y-%m-%d %H:%M:%S',    time.localtime(time.time()))
     timestamp=str(int(ts.gen(st)))
+    start_count=1
+    end_count=55
     base_url = "https://atlas.ripe.net/api/v2/measurements/10301/timetravel/"
     static_part = "/?fields=responses.0.response_time,responses.0.abuf.answers.0.data_string,created&probe_ids="
     fix_url=base_url+timestamp+static_part+"1"
-    print(fix_url)
     start_urls=[fix_url]
-   # start_urls = [
-   #    'https://atlas.ripe.net/api/v2/measurements/10301/timetravel/1562910180/?fields=responses.0.response_time,responses.0.abuf.answers.0.data_string,created&probe_ids=2']
     def parse(self, response):
-        print("oparse")
-        urls = response.xpath('body//p/text()').extract()
-        print(len(urls))
-        print(urls)
-        if len(urls) == 0:
-            print("none")
-        else:
-            items = instanceItem()
-            list=urls[0].split(',')
-            items['domain_name']=list[1]
-            items['probe_num']=1
-            items['probe_root']=1
-            yield items
-            print(list[1])
-            print(dnsSpider.st)
-        print(urls)
-        for count in range(2,5):
-            temp_url=self.base_url+self.timestamp+self.static_part+str(count)
+        #print("oparse")
+        #urls = response.xpath('body//p/text()').extract()
+        # print(len(urls))
+        # print(urls)
+        # if len(urls) == 0:
+        #     print("none")
+        # else:
+        #     items = instanceItem()
+        #     list=urls[0].split(',')
+        #     items['domain_name']=list[1]
+        #     items['probe_num']=1
+        #     items['probe_root']=1
+        #     yield items
+        #list_temp_url=[]
+        for count in range(self.start_count,self.end_count):
+            temp_url = self.base_url + self.timestamp + self.static_part
+            for i in range(1000*(count-1),1000*count):
+                temp_url=temp_url+str(i)+","
+            temp_url=temp_url+str(1000*count)
             print(temp_url)
             req=scrapy.Request(temp_url,callback=self.parse_one,dont_filter=True)
-            req.meta['probe'] = count
+            req.meta['root_num']=1
             yield req
-
+        for count_rootnum in range(8,10):
+            temp_base_url = "https://atlas.ripe.net/api/v2/measurements/1030"+str(count_rootnum)+"/timetravel/"
+            for count in range(self.start_count,self.end_count):
+                temp_url = temp_base_url + self.timestamp + self.static_part
+                for i in range(1000 * (count- 1), 1000 * count):
+                    temp_url = temp_url + str(i) + ","
+                temp_url = temp_url + str(1000 * count)
+                print(temp_url)
+                req = scrapy.Request(temp_url, callback=self.parse_one, dont_filter=True)
+                req.meta['root_num'] = count_rootnum
+                yield req
+        #
+        for count_rootnum in range(10,17):
+            temp_base_url = "https://atlas.ripe.net/api/v2/measurements/103"+str(count_rootnum)+"/timetravel/"
+            for count in range(self.start_count, self.end_count):
+                temp_url = temp_base_url + self.timestamp + self.static_part
+                for i in range(1000 * (count - 1), 1000 * count):
+                    temp_url = temp_url + str(i) + ","
+                temp_url = temp_url + str(1000 * count)
+                print(temp_url)
+                req = scrapy.Request(temp_url, callback=self.parse_one, dont_filter=True)
+                req.meta['root_num'] = count_rootnum
+                yield req
+        for count_rootnum in range(4,7):
+            temp_base_url = self.base_url="https://atlas.ripe.net/api/v2/measurements/1030"+str(count_rootnum)+"/timetravel/"
+            for count in range(self.start_count, self.end_count):
+                temp_url = temp_base_url + self.timestamp + self.static_part
+                for i in range(1000 * (count - 1), 1000 * count):
+                    temp_url = temp_url + str(i) + ","
+                temp_url = temp_url + str(1000 * count)
+                print(temp_url)
+                req = scrapy.Request(temp_url, callback=self.parse_one, dont_filter=True)
+                req.meta['root_num'] = count_rootnum
+                yield req
 
     def parse_one(self,response):
-        print("000")
         urls = response.xpath('body//p/text()').extract()
-        print(len(urls))
-        print(urls)
         if len(urls) == 0:
             print("none")
-        else:
-            items = instanceItem()
-            list = urls[0].split(',')
-            items['domain_name'] = list[1]
-            items['probe_num'] = response.meta['probe']
-            items['probe_root'] = 1
-            yield items
-            print(list[1])
-            print(dnsSpider.st)
+        # print(len(urls))
         print(urls)
+        pattern = re.compile('"(\d+)"')
+        list_item = pattern.findall(urls[0])#probe_num list
+        list_temp=urls[0].split(",")
+        print(list_item)
+        print(list_temp)
+        print("len of list_item",len(list_item))
+        print("len of list_temp",len(list_temp))
+        list_hostname=[]
+        for i in range(0,int(len(list_temp)/3)):
+            list_hostname.append(list_temp[3*i+1])#hostname list
+        num=0
+        for count in range(0,len(list_item)):
+            if list_hostname[count] != "null":
+                num+=1
+                items=instanceItem()
+                items['domain_name'] = list_hostname[count]
+                items['probe_num'] = list_item[count]
+                items['probe_root'] = response.meta['root_num']
+                yield items
+        print("num",num)
 

@@ -1,0 +1,7 @@
+X-Frame-Options: SAMEORIGIN
+Vary: Accept, Cookie
+Server: nginx/1.12.2
+Allow: GET, HEAD, OPTIONS
+Content-Type: application/json
+Strict-Transport-Security: max-age=15768000
+Date: Tue, 16 Jul 2019 07:09:28 GMT

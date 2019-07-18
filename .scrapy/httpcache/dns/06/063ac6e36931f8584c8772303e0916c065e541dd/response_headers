@@ -1,0 +1,6 @@
+Server: nginx/1.12.2
+Content-Type: text/plain
+Date: Tue, 16 Jul 2019 07:56:14 GMT
+Strict-Transport-Security: max-age=15768000
+X-Frame-Options: SAMEORIGIN
+Vary: Cookie

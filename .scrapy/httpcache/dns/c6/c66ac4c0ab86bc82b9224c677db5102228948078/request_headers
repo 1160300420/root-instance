@@ -1,0 +1,5 @@
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding: gzip,deflate
+Referer: https://atlas.ripe.net/api/v2/measurements/10301/timetravel/1563203686/?fields=responses.0.response_time,responses.0.abuf.answers.0.data_string,created&probe_ids=1
+Accept-Language: en
+User-Agent: Scrapy/1.6.0 (+https://scrapy.org)
