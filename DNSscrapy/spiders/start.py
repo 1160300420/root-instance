@@ -18,20 +18,6 @@ class dnsSpider(scrapy.Spider):
     fix_url=base_url+timestamp+static_part+"1"
     start_urls=[fix_url]
     def parse(self, response):
-        #print("oparse")
-        #urls = response.xpath('body//p/text()').extract()
-        # print(len(urls))
-        # print(urls)
-        # if len(urls) == 0:
-        #     print("none")
-        # else:
-        #     items = instanceItem()
-        #     list=urls[0].split(',')
-        #     items['domain_name']=list[1]
-        #     items['probe_num']=1
-        #     items['probe_root']=1
-        #     yield items
-        #list_temp_url=[]
         for count in range(self.start_count,self.end_count):
             temp_url = self.base_url + self.timestamp + self.static_part
             for i in range(1000*(count-1),1000*count):
