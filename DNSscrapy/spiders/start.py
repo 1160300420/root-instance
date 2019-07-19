@@ -67,14 +67,14 @@ class dnsSpider(scrapy.Spider):
         if len(urls) == 0:
             print("none")
         # print(len(urls))
-        print(urls)
+        #print(urls)
         pattern = re.compile('"(\d+)"')
         list_item = pattern.findall(urls[0])#probe_num list
         list_temp=urls[0].split(",")
-        print(list_item)
-        print(list_temp)
-        print("len of list_item",len(list_item))
-        print("len of list_temp",len(list_temp))
+        # print(list_item)
+        # print(list_temp)
+        # print("len of list_item",len(list_item))
+        # print("len of list_temp",len(list_temp))
         list_hostname=[]
         for i in range(0,int(len(list_temp)/3)):
             list_hostname.append(list_temp[3*i+1])#hostname list
